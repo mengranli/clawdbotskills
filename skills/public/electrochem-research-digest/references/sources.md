@@ -6,12 +6,16 @@ Primary targets (prefer RSS feeds; fall back to listing pages if RSS is blocked)
 
 ### Nature family
 
+- Nature — https://www.nature.com/nature.rss
 - Nature Energy — https://www.nature.com/nenergy.rss
+- Nature Chemistry — https://www.nature.com/nchem.rss
+- Nature Materials — https://www.nature.com/nmat.rss
+- Nature Sustainability — https://www.nature.com/natsustain.rss
 - Nature Chemical Engineering — https://www.nature.com/natchemeng.rss
 - Nature Catalysis — https://www.nature.com/natcatal.rss
 - Nature Communications — https://www.nature.com/ncomms.rss
 
-(Other Nature titles generally follow the same pattern: `https://www.nature.com/<journal>.rss`.)
+(Other Nature titles often follow the pattern: `https://www.nature.com/<journal>.rss`.)
 
 ### AAAS
 
