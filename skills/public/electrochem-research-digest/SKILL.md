@@ -9,7 +9,7 @@ Produce a daily digest for Aaron with highlights + links across electrochemical 
 
 ## Output format (Telegram-friendly)
 
-- 5–15 bullets total (configurable)
+- Target: **6 papers + 4 news** (vary as needed, but keep **< 15 items total**).
 - For **journal articles** include:
   - Title
   - Lead author
@@ -24,6 +24,7 @@ Produce a daily digest for Aaron with highlights + links across electrochemical 
 1) Gather candidate items (past 24h or since last run)
 - Prefer RSS feeds and publisher listing pages where possible.
 - Use web search for news/funding.
+- LinkedIn / Bluesky: **best-effort via web search** (no login scraping). If a specific public URL/RSS/feed is provided later, prefer that.
 
 2) De-duplicate
 - Same URL/title → keep best source.
