@@ -170,16 +170,42 @@ def row_range(token: str, drive_id: str, item_id: str, table: str, index: int):
     )
 
 
-def update_range_values(token: str, drive_id: str, item_id: str, address: str, values_2d: list):
-    """Patch a workbook range with values.
+def _split_address(address: str) -> tuple[str | None, str]:
+    """Split an Excel address into (worksheet, local_address).
 
-    address is typically like: Sheet1!A2:L2
+    Examples:
+      "Sheet1!A2:L2" -> ("Sheet1", "A2:L2")
+      "'Sheet 1'!A2:L2" -> ("Sheet 1", "A2:L2")
+      "A2:L2" -> (None, "A2:L2")
+    """
+    if "!" not in address:
+        return None, address
+    ws, local = address.split("!", 1)
+    ws = ws.strip("'")
+    return ws, local
+
+
+def update_range_values(
+    token: str,
+    drive_id: str,
+    item_id: str,
+    worksheet: str,
+    address: str,
+    values_2d: list,
+):
+    """Patch a worksheet range with values.
+
+    Graph does not support /workbook/range on driveItem workbooks; use
+    /workbook/worksheets('name')/range(...).
+
+    address should be local to the worksheet, e.g. "A2:L2".
     """
     body = {"values": values_2d}
-    addr = quote(address, safe="")
+    ws_enc = quote(worksheet, safe="")
+    addr_enc = quote(address, safe="")
     return graph_json(
         "PATCH",
-        f"{GRAPH}/drives/{drive_id}/items/{item_id}/workbook/range(address='{addr}')",
+        f"{GRAPH}/drives/{drive_id}/items/{item_id}/workbook/worksheets('{ws_enc}')/range(address='{addr_enc}')",
         token,
         json=body,
     )
@@ -199,6 +225,7 @@ def main() -> int:
         action="store_true",
         help="Fill the first completely empty row inside the table (if any) instead of appending to bottom.",
     )
+    ap.add_argument("--worksheet", default="Sheet1", help="Worksheet name (used for range updates)")
 
     args = ap.parse_args()
 
@@ -237,14 +264,19 @@ def main() -> int:
             address = rng.get("address")
             if not address:
                 raise RuntimeError(f"Could not resolve range address for table row index {empty_index}: {rng}")
+
+            ws, local_addr = _split_address(address)
+            worksheet = ws or args.worksheet
+
             # range expects 2D array
-            res = update_range_values(token, drive_id, item_id, address, [row])
+            res = update_range_values(token, drive_id, item_id, worksheet, local_addr, [row])
             print(
                 json.dumps(
                     {
                         "ok": True,
                         "mode": "fill-first-empty",
                         "filled_index": empty_index,
+                        "worksheet": worksheet,
                         "address": address,
                         "drive_id": drive_id,
                         "item_id": item_id,
