@@ -2,12 +2,40 @@
 
 ## Journals / publishers (preferred)
 
-Primary targets (use RSS or publisher listing pages when available):
-- Nature (and family): Nature, Nature Energy, Nature Chemistry, Nature Materials, Nature Sustainability, Nature Communications, Nature Chemical Engineering
-- Science, Science Advances
-- ACS Energy Letters
-- Energy & Environmental Science
-- Advanced Materials
+Primary targets (prefer RSS feeds; fall back to listing pages if RSS is blocked):
+
+### Nature family
+
+- Nature Energy — https://www.nature.com/nenergy.rss
+- Nature Chemical Engineering — https://www.nature.com/natchemeng.rss
+- Nature Catalysis — https://www.nature.com/natcatal.rss
+- Nature Communications — https://www.nature.com/ncomms.rss
+
+(Other Nature titles generally follow the same pattern: `https://www.nature.com/<journal>.rss`.)
+
+### AAAS
+
+- Science (TOC) — https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science
+- Science Advances (TOC) — https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=sciadv
+
+### ACS
+
+- ACS Energy Letters (TOC) — https://pubs.acs.org/action/showFeed?type=etoc&feed=rss&jc=aelccp
+- ACS Catalysis (TOC) — https://pubs.acs.org/action/showFeed?type=etoc&feed=rss&jc=accacs
+
+### Cell Press
+
+- Joule (RSS) — https://www.cell.com/joule/rss
+  - Note: currently returns a bot challenge (403) from this environment; fall back to Crossref/Semantic Scholar queries for Joule until RSS fetch is accessible.
+
+### RSC
+
+- Energy & Environmental Science — listing page: https://pubs.rsc.org/en/journals/journalissues/ee#!recentarticles
+  - Note: could not resolve a stable RSS endpoint from this environment; treat as listing-page scrape for now.
+
+### Other
+
+- Advanced Materials — use listing pages / Crossref queries (RSS varies).
 
 Notes:
 - Many are partially paywalled; aim to collect at least: title, authors, date, journal, URL.
