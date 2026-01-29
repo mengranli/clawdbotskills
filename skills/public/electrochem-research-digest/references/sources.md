@@ -55,6 +55,7 @@ Track new papers/posts mentioning:
 - Brian Seger
 - Haotian Wang
 - Shannon Boettcher
+- Curtis Berlinguette
 
 Heuristics: search for (author:"<name>") via Crossref/Semantic Scholar/arXiv; also keyword search that includes the group name.
 
