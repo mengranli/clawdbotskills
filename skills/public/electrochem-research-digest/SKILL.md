@@ -21,9 +21,13 @@ Produce a daily digest for Aaron with highlights + links across electrochemical 
 
 ## Workflow
 
+0) Update author radar (weekly/monthly)
+- Run `scripts/update_author_radar.py` to harvest lead authors from the configured RSS feeds and keep a rolling count.
+- This can auto-append new names into `references/author-radar.md` under **Auto-added (pending review)**.
+
 1) Gather candidate items (past 24h or since last run)
 - Prefer RSS feeds and publisher listing pages where possible.
-- Use web search for news/funding.
+- Use web search for news/funding (requires Brave API key in this environment).
 - LinkedIn / Bluesky: **best-effort via web search** (no login scraping). If a specific public URL/RSS/feed is provided later, prefer that.
 
 2) De-duplicate
