@@ -42,7 +42,9 @@ Best practice: the workbook has an Excel **Table** (Insert → Table) named e.g.
 - Column guidance: see `references/ledger-schema.md`.
 - Parsing heuristics: see `references/parsing-guidelines.md`.
 
-Use `scripts/graph_excel_append.py` to append a row via a OneDrive share link.
+Use `scripts/graph_excel_append.py` to write into the Excel table via a OneDrive share link.
+
+Important: Excel’s `rows/add` always appends to the bottom of the table. If the table contains blank rows (e.g. row 2 empty), call the script with `--fill-first-empty` to fill the first completely empty row inside the table.
 
 ### 5) Confirm (optional)
 In busy group chats, keep confirmation minimal:

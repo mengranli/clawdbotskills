@@ -28,6 +28,7 @@ import sys
 from pathlib import Path
 
 import requests
+from urllib.parse import quote
 
 try:
     import msal  # type: ignore
@@ -152,6 +153,38 @@ def add_row(token: str, drive_id: str, item_id: str, table: str, values: list):
     )
 
 
+def list_rows(token: str, drive_id: str, item_id: str, table: str, top: int = 1000):
+    return graph_json(
+        "GET",
+        f"{GRAPH}/drives/{drive_id}/items/{item_id}/workbook/tables/{table}/rows?$top={top}",
+        token,
+    )
+
+
+def row_range(token: str, drive_id: str, item_id: str, table: str, index: int):
+    # Returns a workbookRange including address
+    return graph_json(
+        "GET",
+        f"{GRAPH}/drives/{drive_id}/items/{item_id}/workbook/tables/{table}/rows/itemAt(index={index})/range",
+        token,
+    )
+
+
+def update_range_values(token: str, drive_id: str, item_id: str, address: str, values_2d: list):
+    """Patch a workbook range with values.
+
+    address is typically like: Sheet1!A2:L2
+    """
+    body = {"values": values_2d}
+    addr = quote(address, safe="")
+    return graph_json(
+        "PATCH",
+        f"{GRAPH}/drives/{drive_id}/items/{item_id}/workbook/range(address='{addr}')",
+        token,
+        json=body,
+    )
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--client-id", required=True)
@@ -161,6 +194,11 @@ def main() -> int:
     ap.add_argument("--columns", help="Comma-separated column order to write")
     ap.add_argument("--values-json", help="JSON object with fields; will be mapped into --columns order")
     ap.add_argument("--list-tables", action="store_true", help="List workbook tables and exit")
+    ap.add_argument(
+        "--fill-first-empty",
+        action="store_true",
+        help="Fill the first completely empty row inside the table (if any) instead of appending to bottom.",
+    )
 
     args = ap.parse_args()
 
@@ -182,8 +220,43 @@ def main() -> int:
 
     row = [data.get(c, "") for c in cols]
 
+    # Excel table rows/add always appends to the end of the table. If the user has
+    # blank rows inside the table, optionally fill the first empty row instead.
+    if args.fill_first_empty:
+        rows = list_rows(token, drive_id, item_id, args.table, top=2000)
+        values = rows.get("value", []) if rows else []
+        empty_index = None
+        for r in values:
+            idx = r.get("index")
+            rvals = (r.get("values") or [[[]]])[0]
+            if all((v is None) or (str(v).strip() == "") for v in rvals):
+                empty_index = idx
+                break
+        if empty_index is not None:
+            rng = row_range(token, drive_id, item_id, args.table, int(empty_index))
+            address = rng.get("address")
+            if not address:
+                raise RuntimeError(f"Could not resolve range address for table row index {empty_index}: {rng}")
+            # range expects 2D array
+            res = update_range_values(token, drive_id, item_id, address, [row])
+            print(
+                json.dumps(
+                    {
+                        "ok": True,
+                        "mode": "fill-first-empty",
+                        "filled_index": empty_index,
+                        "address": address,
+                        "drive_id": drive_id,
+                        "item_id": item_id,
+                        "result": res,
+                    },
+                    ensure_ascii=False,
+                )
+            )
+            return 0
+
     res = add_row(token, drive_id, item_id, args.table, row)
-    print(json.dumps({"ok": True, "drive_id": drive_id, "item_id": item_id, "result": res}, ensure_ascii=False))
+    print(json.dumps({"ok": True, "mode": "append-bottom", "drive_id": drive_id, "item_id": item_id, "result": res}, ensure_ascii=False))
     return 0
 
 
