@@ -139,7 +139,7 @@ def main() -> int:
     ap.add_argument("--top", type=int, default=20)
     ap.add_argument("--sleep", type=float, default=0.2)
     ap.add_argument("--seed", default="", help="Optional path to author-radar.md to exclude existing names")
-    ap.add_argument("--apply", action="store_true", help="Append suggested names into author-radar.md under an auto-added section")
+    ap.add_argument("--apply", action="store_true", help="Append suggested names into author-radar.md under an auto-added section (requires Aaron approval before running in production)")
     ap.add_argument("--min-count", type=int, default=3, help="Minimum count (in rolling state) to auto-add when --apply is set")
     ap.add_argument("--deny", default="", help="Comma-separated denylist of names to never auto-add")
 

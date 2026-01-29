@@ -15,7 +15,9 @@ This file defines the “who to watch” list for electrochem engineering resear
 
 ## Auto-population (heuristic)
 
-Goal: periodically expand the radar to include highly active authors/groups in the target journal set.
+Goal: periodically suggest additions to the radar based on high publication activity.
+
+Policy: **Do not auto-add names without Aaron’s approval.** Collect suggestions + counts, ask Aaron to confirm which to add, then update the seed list.
 
 Suggested method (no paywalled scraping):
 
