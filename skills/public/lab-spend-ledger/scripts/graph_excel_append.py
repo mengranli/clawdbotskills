@@ -40,7 +40,6 @@ GRAPH = "https://graph.microsoft.com/v1.0"
 DEFAULT_SCOPES = [
     # For Excel workbook access through the file
     "Files.ReadWrite.All",
-    "offline_access",
 ]
 
 
