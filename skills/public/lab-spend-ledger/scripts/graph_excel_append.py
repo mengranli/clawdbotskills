@@ -50,11 +50,20 @@ def _share_id(share_url: str) -> str:
 
 
 def _token_cache_path() -> Path:
-    # Keep local to the skill for simplicity; can be overridden by env.
+    """Return a stable MSAL token cache path.
+
+    Default is outside the repo so it persists across skill repackaging and
+    does not get committed.
+
+    Override with env: CLAWD_LEDGER_TOKEN_CACHE
+    """
     p = os.environ.get("CLAWD_LEDGER_TOKEN_CACHE")
     if p:
-        return Path(p)
-    return Path(__file__).resolve().parent / ".token_cache.bin"
+        return Path(p).expanduser()
+
+    state_dir = Path(os.path.expanduser("~/.clawdbot"))
+    state_dir.mkdir(parents=True, exist_ok=True)
+    return state_dir / "msal_token_cache_lab_spend_ledger.json"
 
 
 def _load_cache() -> "msal.SerializableTokenCache":
