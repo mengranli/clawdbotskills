@@ -44,7 +44,7 @@ Best practice: the workbook has an Excel **Table** (Insert → Table) named e.g.
 
 Use `scripts/graph_excel_append.py` to write into the Excel table via a OneDrive share link.
 
-Important: Excel’s `rows/add` always appends to the bottom of the table. If the table contains blank rows (e.g. row 2 empty), call the script with `--fill-first-empty` to fill the first completely empty row inside the table.
+Important: Excel’s `rows/add` always appends to the bottom of the table. For Option 1 (“auto-expand table”), prefer **append-bottom** behavior and avoid leaving blank rows inside the table.
 
 ### 5) Confirm (optional)
 In busy group chats, keep confirmation minimal:
