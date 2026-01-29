@@ -1,5 +1,15 @@
 # Parsing guidelines (Telegram → ledger row)
 
+## Group chat policy (spend-only)
+
+For the spend-only Telegram group `chat_id=-1003711269809`:
+
+- Trigger on messages containing **"buy"** (case-insensitive).
+- If a message does **not** contain "buy", do **not** engage (stay silent), unless the user is clearly trying to log spend but forgot the keyword—then reply once with the required format.
+- If someone asks unrelated questions, reply once:
+  “Spend logging only. Please log purchases with **BUY** (e.g. `BUY: item; amount currency; project_code; category; vendor=...`).”
+  then ignore further off-topic.
+
 ## What to extract
 
 From an unstructured message about a purchase, extract:
