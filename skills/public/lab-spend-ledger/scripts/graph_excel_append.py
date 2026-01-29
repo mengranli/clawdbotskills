@@ -150,9 +150,9 @@ def main() -> int:
     ap.add_argument("--tenant", default="common")
     ap.add_argument("--share-url", required=True)
     ap.add_argument("--table", required=True, help="Excel Table name or id (recommended: name, e.g. Ledger)")
-    ap.add_argument("--columns", required=True, help="Comma-separated column order to write")
-    ap.add_argument("--values-json", required=True, help="JSON object with fields; will be mapped into --columns order")
-    ap.add_argument("--scopes", default=",")
+    ap.add_argument("--columns", help="Comma-separated column order to write")
+    ap.add_argument("--values-json", help="JSON object with fields; will be mapped into --columns order")
+    ap.add_argument("--list-tables", action="store_true", help="List workbook tables and exit")
 
     args = ap.parse_args()
 
@@ -160,6 +160,14 @@ def main() -> int:
 
     token = get_access_token(args.client_id, args.tenant, scopes)
     drive_id, item_id = resolve_drive_item(token, args.share_url)
+
+    if args.list_tables:
+        tables = list_tables(token, drive_id, item_id)
+        print(json.dumps({"ok": True, "drive_id": drive_id, "item_id": item_id, "tables": tables}, ensure_ascii=False))
+        return 0
+
+    if not args.columns or not args.values_json:
+        raise SystemExit("--columns and --values-json are required unless --list-tables is used")
 
     data = json.loads(args.values_json)
     cols = [c.strip() for c in args.columns.split(",") if c.strip()]

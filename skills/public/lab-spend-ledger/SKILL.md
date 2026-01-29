@@ -53,7 +53,7 @@ In busy group chats, keep confirmation minimal:
 
 To fully automate, collect:
 - **Workbook share URL** (provided)
-- **Excel Table name** (e.g. `Ledger`)
+- **Excel Table name** (create one in Excel Online via Insert → Table; e.g. name it `Ledger`)
 - **Column order** used by the table (comma-separated)
 - Azure app details:
   - `client_id` (provided)
