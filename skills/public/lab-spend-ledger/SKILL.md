@@ -10,55 +10,46 @@ Maintain a shared spend ledger from unstructured chat messages (Telegram now; ex
 ## Workflow
 
 ### 1) Detect “this is a spend”
-Treat a message as a spend record if it includes *any* of:
-- money amount + currency/symbol
-- purchase verbs: bought/ordered/paid/spent
-- vendor/store names + an item
-
-If it’s ambiguous, ask: “Is this a purchase to log?”
+Trigger in the spend group when the message contains **buy** (case-insensitive).
 
 ### 2) Draft a row (best-effort extraction)
-Extract these fields:
-- `timestamp_utc` (use message time)
-- `submitted_by`, `submitted_by_id`, `chat`, `message_id`, `raw_text`
-- `item`
-- `total` and `currency` (or unit_price + qty)
-- `category` (Lab consumables | Equipment | Chemicals & gases)
-- `project_code` (DE | DE Est | KC8 CO2R | KC8 pH swing | ASG | DP | LP | Startup | Pursuit)
-- optional: vendor, qty, notes
+Extract:
+- `ts_iso` (message timestamp)
+- `chat_id`, `message_id`, `author_id`, `author_name`, `raw_text`
+- `item`, `price`, `currency`, `category`, `project_code`
+- optional: qty/vendor in `notes`
 
-Use `scripts/parse_purchase_message.py` to get a first draft, but always sanity-check.
+Use `scripts/parse_purchase_message.py` for a first draft, but sanity-check.
 
 ### 3) Clarify (single lightweight question)
-If any required fields are missing or low-confidence, ask **one** follow-up message listing the missing fields, e.g.:
+If any required fields are missing/unclear, ask **one** follow-up that lists missing fields.
 
-> I can log this—what’s the **project code** and **category** (consumables/equipment/chemicals & gases)?
+### 4) Idempotency (before writing)
+Use `references/idempotency.md`:
+- Prefer message-id dedupe key `telegram:<chat_id>:message:<message_id>`.
+- If unsure, verify against Excel with `scripts/find_excel_rows.py`.
 
-If multiple items are in one message, prefer: “Is this 1 line item or multiple? If multiple, list them like: item — amount — project.”
+### 5) Append to Excel (Graph) — MUST HAPPEN BEFORE REPLY
+Best practice: workbook has an Excel **Table** named `Ledger`.
 
-### 4) Append to Excel (Graph)
-Best practice: the workbook has an Excel **Table** (Insert → Table) named `Ledger` with stable columns.
+- Runtime settings: `references/runtime-config.md`
 
-- Runtime settings: see `references/runtime-config.md`.
-- Column guidance: see `references/ledger-schema.md`.
-- Parsing heuristics: see `references/parsing-guidelines.md`.
-- Idempotency / repeats: see `references/idempotency.md` (uses message-id dedupe; can also verify via Excel search with `scripts/find_excel_rows.py`).
+Execution requirement:
+- Call the Excel append via an `exec` tool call and **check it returned ok**.
+- Only after Excel returns success, mark dedupe and reply.
 
-**Important (execution):** Microsoft auth uses `msal`, which is installed in the repo virtualenv. When appending, run via exec using:
+Preferred append command (works even if system python is used; `graph_excel_append.py` can load `msal` from the repo `.venv`):
 
 ```bash
-. .venv/bin/activate
 python skills/public/lab-spend-ledger/scripts/log_spend_to_excel.py ...
 ```
 
-**Never reply “Logged ✅” until the Excel append returns success.**
+Hard rule:
+- **Never send “Logged ✅” unless the Graph append returned success.**
+- If append fails, reply with a short error and do not mark dedupe.
 
-Important: Excel’s `rows/add` always appends to the bottom of the table (auto-expands). Avoid leaving blank rows inside the table.
-
-### 5) Confirm (optional)
-In busy group chats, keep confirmation minimal:
-- If confidence is high: “Logged: <item>, <amount> <ccy>, <project>.”
-- If you had to guess: “Logged (please confirm): …”
+### 6) Confirm
+Keep it minimal: “Logged ✅ …”
 
 ## Excel/Graph setup requirements (ask the owner if missing)
 
