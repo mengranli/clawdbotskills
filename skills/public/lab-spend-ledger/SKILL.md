@@ -37,14 +37,22 @@ If any required fields are missing or low-confidence, ask **one** follow-up mess
 If multiple items are in one message, prefer: “Is this 1 line item or multiple? If multiple, list them like: item — amount — project.”
 
 ### 4) Append to Excel (Graph)
-Best practice: the workbook has an Excel **Table** (Insert → Table) named e.g. `Ledger` with stable columns.
+Best practice: the workbook has an Excel **Table** (Insert → Table) named `Ledger` with stable columns.
 
+- Runtime settings: see `references/runtime-config.md`.
 - Column guidance: see `references/ledger-schema.md`.
 - Parsing heuristics: see `references/parsing-guidelines.md`.
 
-Use `scripts/graph_excel_append.py` to write into the Excel table via a OneDrive share link.
+**Important (execution):** Microsoft auth uses `msal`, which is installed in the repo virtualenv. When appending, run via exec using:
 
-Important: Excel’s `rows/add` always appends to the bottom of the table. For Option 1 (“auto-expand table”), prefer **append-bottom** behavior and avoid leaving blank rows inside the table.
+```bash
+. .venv/bin/activate
+python skills/public/lab-spend-ledger/scripts/log_spend_to_excel.py ...
+```
+
+(or call `graph_excel_append.py` directly, but still inside the venv).
+
+Important: Excel’s `rows/add` always appends to the bottom of the table (auto-expands). Avoid leaving blank rows inside the table.
 
 ### 5) Confirm (optional)
 In busy group chats, keep confirmation minimal:
