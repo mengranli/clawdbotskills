@@ -10,7 +10,12 @@ Maintain a shared spend ledger from unstructured chat messages (Telegram now; ex
 ## Workflow
 
 ### 1) Detect “this is a spend”
-Trigger in the spend group when the message contains **buy** (case-insensitive).
+In the spend group, treat a message as a logging candidate when it contains **buy** (case-insensitive) and an amount + currency.
+
+Operational note (reliability):
+- In busy groups, LLM turns are not guaranteed to tool-call every time.
+- For production reliability, run the bundled watcher script on a schedule (e.g. every 1–5 minutes) to deterministically append rows to Excel:
+  - `scripts/watch_buy_and_append.py`
 
 ### 2) Draft a row (best-effort extraction)
 Extract:
@@ -34,19 +39,29 @@ Best practice: workbook has an Excel **Table** named `Ledger`.
 
 - Runtime settings: `references/runtime-config.md`
 
-Execution requirement:
-- Call the Excel append via an `exec` tool call and **check it returned ok**.
-- Only after Excel returns success, mark dedupe and reply.
+Execution requirement (non-negotiable):
+- When you decide “this message should be logged”, you MUST immediately run the append command via an `exec` tool call.
+- You MUST wait for the tool result.
+- Only if it returns JSON with `ok:true` may you reply **Logged ✅**.
+- The confirmation MUST include the receipt id (see below). If you cannot produce a receipt, you did not log it.
 
-Preferred append command (works even if system python is used; `graph_excel_append.py` can load `msal` from the repo `.venv`):
+Preferred append command:
 
 ```bash
-python skills/public/lab-spend-ledger/scripts/log_spend_to_excel.py ...
+python skills/public/lab-spend-ledger/scripts/log_spend_to_excel.py \
+  --ts-iso "..." --chat-id "..." --message-id "..." --author-id "..." --author-name "..." \
+  --item "..." --price 1.23 --currency AUD \
+  --category "Lab consumables" --project-code Pursuit \
+  --notes "..." --raw-text "..."
 ```
 
+Receipt policy (Aaron choice **B**):
+- Always embed a stable receipt in the Excel `notes` field: `receipt=telegram:<chat_id>:<message_id>`.
+- The script prints the `receipt` (and, when available, `excel_index`) on success.
+
 Hard rule:
-- **Never send “Logged ✅” unless the Graph append returned success.**
-- If append fails, reply with a short error and do not mark dedupe.
+- **Never send “Logged ✅” unless the append tool call returned ok:true.**
+- If append fails, reply: `⚠️ Not written to Excel: <short reason>` and do not mark dedupe.
 
 ### 6) Confirm
 Keep it minimal: “Logged ✅ …”

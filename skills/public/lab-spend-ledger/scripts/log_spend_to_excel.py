@@ -44,8 +44,20 @@ def main() -> int:
     ap.add_argument("--project-code", required=True)
     ap.add_argument("--notes", default="")
     ap.add_argument("--raw-text", required=True)
+    ap.add_argument(
+        "--receipt",
+        default="",
+        help="Optional receipt id to embed in notes (recommended: telegram:<chat_id>:<message_id>)",
+    )
 
     args = ap.parse_args()
+
+    receipt = args.receipt or f"telegram:{args.chat_id}:{args.message_id}"
+
+    notes = (args.notes or "").strip()
+    receipt_tag = f"receipt={receipt}"
+    if receipt_tag not in notes:
+        notes = (notes + ("; " if notes else "") + receipt_tag).strip()
 
     values = {
         "ts_iso": args.ts_iso,
@@ -58,7 +70,7 @@ def main() -> int:
         "currency": args.currency,
         "category": args.category,
         "project_code": args.project_code,
-        "notes": args.notes,
+        "notes": notes,
         "raw_text": args.raw_text,
     }
 
@@ -83,7 +95,34 @@ def main() -> int:
     if p.returncode != 0:
         sys.stderr.write(p.stderr or p.stdout)
         return p.returncode
-    sys.stdout.write(p.stdout)
+
+    # Normalize output for the agent: include receipt + excel row index when available.
+    try:
+        out = json.loads(p.stdout)
+    except Exception:
+        sys.stdout.write(p.stdout)
+        return 0
+
+    index = None
+    try:
+        # Graph rows/add response: result.index (usually)
+        index = out.get("result", {}).get("index")
+    except Exception:
+        index = None
+
+    sys.stdout.write(
+        json.dumps(
+            {
+                "ok": True,
+                "receipt": receipt,
+                "mode": out.get("mode"),
+                "excel_index": index,
+                "drive_id": out.get("drive_id"),
+                "item_id": out.get("item_id"),
+            },
+            ensure_ascii=False,
+        )
+    )
     return 0
 
 

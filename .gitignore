@@ -1,0 +1,15 @@
+# Clawdbot local state / secrets
+.msal_token_cache.json
+*.token
+
+# Python
+__pycache__/
+*.pyc
+
+# Local workspace notes / runtime artifacts
+memory/
+canvas/
+
+# OS/editor
+.DS_Store
+*.swp
