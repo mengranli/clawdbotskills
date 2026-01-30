@@ -42,7 +42,7 @@ Best practice: the workbook has an Excel **Table** (Insert → Table) named `Led
 - Runtime settings: see `references/runtime-config.md`.
 - Column guidance: see `references/ledger-schema.md`.
 - Parsing heuristics: see `references/parsing-guidelines.md`.
-- Idempotency / repeats: see `references/idempotency.md`.
+- Idempotency / repeats: see `references/idempotency.md` (uses message-id dedupe; can also verify via Excel search with `scripts/find_excel_rows.py`).
 
 **Important (execution):** Microsoft auth uses `msal`, which is installed in the repo virtualenv. When appending, run via exec using:
 
