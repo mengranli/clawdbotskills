@@ -33,7 +33,20 @@ from urllib.parse import quote
 try:
     import msal  # type: ignore
 except ImportError:
-    msal = None
+    # Fallback: attempt to load msal from a local venv (common on managed Python setups).
+    # This helps when the agent runs system python but dependencies live in .venv.
+    import glob
+
+    venv_root = Path(__file__).resolve().parents[4] / ".venv"  # repo/.venv
+    candidates = []
+    candidates += glob.glob(str(venv_root / "lib" / "python*" / "site-packages"))
+    for p in candidates:
+        if p not in sys.path:
+            sys.path.insert(0, p)
+    try:
+        import msal  # type: ignore
+    except ImportError:
+        msal = None
 
 
 GRAPH = "https://graph.microsoft.com/v1.0"
