@@ -111,8 +111,8 @@ def find_currency_and_amount(text: str) -> tuple[str | None, float | None, float
         amt = float(m.group(2))
         return ccy, amt, 0.7
 
-    # Bare amount with a currency suffix: 12.34 aud
-    m = re.search(r"\b([0-9]+(?:\.[0-9]{1,2})?)\s*(aud|usd|gbp|eur|nzd)\b", text, re.IGNORECASE)
+    # Bare amount with a currency suffix (with or without space): 12.34 aud / 12.34AUD
+    m = re.search(r"\b([0-9]+(?:\.[0-9]{1,2})?)(?:\s*)(aud|usd|gbp|eur|nzd)\b", text, re.IGNORECASE)
     if m:
         ccy = CURRENCY_TOKENS[m.group(2).upper()]
         amt = float(m.group(1))
