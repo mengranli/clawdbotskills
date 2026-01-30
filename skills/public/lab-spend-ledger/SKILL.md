@@ -42,6 +42,7 @@ Best practice: the workbook has an Excel **Table** (Insert → Table) named `Led
 - Runtime settings: see `references/runtime-config.md`.
 - Column guidance: see `references/ledger-schema.md`.
 - Parsing heuristics: see `references/parsing-guidelines.md`.
+- Idempotency / repeats: see `references/idempotency.md`.
 
 **Important (execution):** Microsoft auth uses `msal`, which is installed in the repo virtualenv. When appending, run via exec using:
 
@@ -50,7 +51,7 @@ Best practice: the workbook has an Excel **Table** (Insert → Table) named `Led
 python skills/public/lab-spend-ledger/scripts/log_spend_to_excel.py ...
 ```
 
-(or call `graph_excel_append.py` directly, but still inside the venv).
+**Never reply “Logged ✅” until the Excel append returns success.**
 
 Important: Excel’s `rows/add` always appends to the bottom of the table (auto-expands). Avoid leaving blank rows inside the table.
 
