@@ -4,14 +4,12 @@ This file defines the “who to watch” list for electrochem engineering resear
 
 ## Seed list (manual)
 
-- Ted Sargent
-- David Sinton
-- Peter Strasser
-- Tom Burdyny
-- Brian Seger
-- Haotian Wang
-- Shannon Boettcher
-- Curtis Berlinguette
+**Private:** Do not store personal/name watchlists in the public GitHub repo.
+
+Keep the seed list in a local-only file (not committed), e.g.:
+- `~/.clawdbot/electrochem-author-radar-private.txt`
+
+The weekly author-radar updater should propose candidates; Aaron approves any additions.
 
 ## Auto-population (heuristic)
 

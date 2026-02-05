@@ -47,17 +47,12 @@ Notes:
 
 ## Research groups (people)
 
-Track new papers/posts mentioning:
-- Ted Sargent
-- David Sinton
-- Peter Strasser
-- Tom Burdyny
-- Brian Seger
-- Haotian Wang
-- Shannon Boettcher
-- Curtis Berlinguette
+**Private:** Do not store personal/name watchlists in the public GitHub repo.
 
-Heuristics: search for (author:"<name>") via Crossref/Semantic Scholar/arXiv; also keyword search that includes the group name.
+If you want to track specific groups/people, keep the list in a local-only file (not committed), e.g.:
+- `~/.clawdbot/electrochem-author-radar-private.txt`
+
+Heuristics (when a private list exists): search for author:"<name>" via Crossref/Semantic Scholar/arXiv; also keyword search that includes the name.
 
 ## Topics (keywords)
 
